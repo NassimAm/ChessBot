@@ -7,10 +7,10 @@
 #define GUI_H
 
 #define SCREEN_WIDTH   650
-#define SCREEN_HEIGHT  650
+#define SCREEN_HEIGHT  750
 
 #define BOARD_POS_X 0
-#define BOARD_POS_Y 0
+#define BOARD_POS_Y 50
 #define BOARD_OFFSET_X 8
 #define BOARD_OFFSET_Y 8
 
@@ -44,7 +44,7 @@ typedef struct {
 void initSDL(App *app);
 
 // Capture tout entrée de l'utilisateur
-void doInput(int *selectedX, int *selectedY);
+void doInput(int *selectedX, int *selectedY, int *moveToX, int *moveToY);
 
 // Prépare la scène sur le fenêtre
 void prepareScene(App *app);
@@ -71,6 +71,6 @@ void setBoardConf(App *app, Board *board, struct config conf);
 Board initBoard(App *app, struct config conf);
 
 // Afficher l'échiquier et ses pièces
-void drawBoard(App *app, Board board, struct config conf, int selectedX, int selectedY);
+void drawBoard(App *app, Board board, struct config conf, int *selectedX, int *selectedY);
 
 #endif

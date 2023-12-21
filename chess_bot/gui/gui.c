@@ -48,7 +48,7 @@ void initSDL(App *app)
 }
 
 // Capture tout entrée de l'utilisateur
-void doInput(int *selectedX, int *selectedY)
+void doInput(int *selectedX, int *selectedY, int *moveToX, int *moveToY)
 {
 	SDL_Event event;
 
@@ -65,13 +65,23 @@ void doInput(int *selectedX, int *selectedY)
 				if(event.button.x >= BOARD_POS_X + BOARD_OFFSET_X && event.button.x <= BOARD_POS_X + BOARD_OFFSET_X + 8*GRID_SIZE
 				&& event.button.y >= BOARD_POS_Y + BOARD_OFFSET_Y && event.button.y <= BOARD_POS_Y + BOARD_OFFSET_Y + 8*GRID_SIZE)
 				{
-					*selectedX = (int)((event.button.x - (BOARD_POS_X + BOARD_OFFSET_X)) / GRID_SIZE);
-					*selectedY = 8 - ((int)((event.button.y - (BOARD_POS_Y + BOARD_OFFSET_Y)) / GRID_SIZE) + 1);
+					if(*selectedX != -1 && *selectedY != -1)
+					{
+						*moveToX = (int)((event.button.x - (BOARD_POS_X + BOARD_OFFSET_X)) / GRID_SIZE);
+						*moveToY = 8 - ((int)((event.button.y - (BOARD_POS_Y + BOARD_OFFSET_Y)) / GRID_SIZE) + 1);
+					}
+					else
+					{
+						*selectedX = (int)((event.button.x - (BOARD_POS_X + BOARD_OFFSET_X)) / GRID_SIZE);
+						*selectedY = 8 - ((int)((event.button.y - (BOARD_POS_Y + BOARD_OFFSET_Y)) / GRID_SIZE) + 1);
+					}
 				}
 				else
 				{
 					*selectedX = -1;
 					*selectedY = -1;
+					*moveToX = -1;
+					*moveToY = -1;
 				}
 				break;
 
@@ -224,9 +234,19 @@ Board initBoard(App *app, struct config conf)
 }
 
 // Afficher l'échiquier et ses pièces
-void drawBoard(App *app, Board board, struct config conf, int selectedX, int selectedY){
+void drawBoard(App *app, Board board, struct config conf, int *selectedX, int *selectedY){
 
 	blit(app, board.entity);
+
+	// Vérifier si la case sélectionnée contient une pièce sinon déselectionner
+	if(*selectedX != -1 && *selectedY != -1)
+	{
+		if(!board.pieces[*selectedY][*selectedX].texture)
+		{
+			*selectedX = -1;
+			*selectedY = -1;
+		}
+	}
 
 	for(int i=0; i<8; i++)
 	{
@@ -235,7 +255,7 @@ void drawBoard(App *app, Board board, struct config conf, int selectedX, int sel
 			if(board.pieces[i][j].texture)
 			{
 				// Si la pièce est sélectionnée, l'achiffer comme étant activée
-				if(j == selectedX && i == selectedY){
+				if(j == *selectedX && i == *selectedY){
 					// Marquer la pièce active
 					Entity e;
 					e.x = BOARD_POS_X + BOARD_OFFSET_X + GRID_SIZE*j;
@@ -248,7 +268,7 @@ void drawBoard(App *app, Board board, struct config conf, int selectedX, int sel
 				blit(app, board.pieces[i][j]);
 
 				// La pièce est sélectionnée
-				if(j == selectedX && i == selectedY){
+				if(j == *selectedX && i == *selectedY){
 					// Récupérer les mouvement légaux
 					struct config T[50];
 					int n = 0;

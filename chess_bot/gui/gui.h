@@ -1,6 +1,7 @@
 #include "../../SDL2/include/SDL.h"
 #include "../../SDL2/include/SDL_image.h"
 #include "../chess_engine/jeu.h"
+#include "../../SDL2/include/SDL_ttf.h"
 #include <stdio.h>
 
 #ifndef GUI_H
@@ -55,11 +56,17 @@ void presentScene(App *app);
 // Charger une image depuis in fichier
 SDL_Texture *loadTexture(App *app ,char *filename);
 
+// Charger un font depuis un fichier
+TTF_Font *loadFont(App *app, char *filename, int fontSize);
+
 // Afficher une entitée chargée dans une position (x,y)
 void blit(App *app, Entity e);
 
 // Charge toutes les ressources (images, ...)
 void initAssets(App *app);
+
+// Affiche un texte sur l'écran dans la position voulue
+void drawText(App *app, char *text, int x, int y);
 
 // Retourne la texture qui correspond au type et la couleur de la pièce
 SDL_Texture *getTextureFromPieceType(int t);

@@ -1,12 +1,15 @@
 #include "../../SDL2/include/SDL.h"
 #include "../../SDL2/include/SDL_image.h"
+#include "../../SDL2/include/SDL_ttf.h"
 #include "gui.h"
 #include "../chess_engine/jeu.h"
 #include <stdio.h>
+#include <string.h>
 
 SDL_Texture* piecesTextures[NB_PIECES_TEXTURES];
 SDL_Texture* activeSquareTexture;
 SDL_Texture* moveIndicatorTexture;
+TTF_Font* OpenSansMedium;
 
 // Fonction qui initialise SDL
 void initSDL(App *app)
@@ -24,9 +27,13 @@ void initSDL(App *app)
 	}
 
     if (IMG_Init(IMG_INIT_PNG | IMG_INIT_JPG) == 0) {
-        printf("Error SDL2_image Initialization");
+        printf("Error SDL2_image Initialization: %s\n", SDL_GetError());
         exit(1);
     }
+
+	if ( TTF_Init() < 0 ) {
+		printf("Error initializing SDL_ttf: %s\n", SDL_GetError());
+	}
 
 	app->window = SDL_CreateWindow("Chess 1.0", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, windowFlags);
 
@@ -104,7 +111,7 @@ void presentScene(App *app)
 	SDL_RenderPresent(app->renderer);
 }
 
-// Charger une image depuis in fichier
+// Charger une image depuis un fichier
 SDL_Texture *loadTexture(App *app, char *filename)
 {
 	SDL_Texture *texture;
@@ -121,6 +128,19 @@ SDL_Texture *loadTexture(App *app, char *filename)
 	return texture;
 }
 
+// Charger un font depuis un fichier
+TTF_Font *loadFont(App *app, char *filename, int fontSize)
+{
+	TTF_Font *font = TTF_OpenFont("fonts/OpenSans.ttf", fontSize);
+
+	if (!font)
+    {
+        printf("Error loading font from %s: %s\n", filename, TTF_GetError());
+    }
+
+	return font;
+}
+
 // Afficher une entitée chargée dans une position (x,y)
 void blit(App *app, Entity e)
 {
@@ -135,6 +155,7 @@ void blit(App *app, Entity e)
 
 // Charge toutes les ressources (images, ...)
 void initAssets(App *app){
+	// Textures
 	piecesTextures[0] = loadTexture(app, "assets/pieces/pawn_white.png");
 	piecesTextures[1] = loadTexture(app, "assets/pieces/pawn_black.png");
 	piecesTextures[2] = loadTexture(app, "assets/pieces/bishop_white.png");
@@ -149,6 +170,33 @@ void initAssets(App *app){
 	piecesTextures[11] = loadTexture(app, "assets/pieces/king_black.png");
 	activeSquareTexture = loadTexture(app, "assets/active_square.png");
 	moveIndicatorTexture = loadTexture(app, "assets/move_indicator.png");
+
+	//Fonts
+	OpenSansMedium = loadFont(app, "fonts/OpenSans.ttf", 16);
+}
+
+// Affiche un texte sur l'écran dans la position voulue
+void drawText(App *app, char *text, int x, int y)
+{
+	SDL_Color color = {0, 0, 0};
+	SDL_Color bgColor = {255, 255, 255};
+	SDL_Surface* surfaceMessage = TTF_RenderText_Shaded(OpenSansMedium, text, color, bgColor); 
+
+	// Convertir le texte en une texture
+	SDL_Texture* Message = SDL_CreateTextureFromSurface(app->renderer, surfaceMessage);
+
+	SDL_Rect Message_rect; // Créer le rectangle du texte
+	Message_rect.x = x;  // controler la coordonnée x
+	Message_rect.y = y; // controler la coordonnée y
+	Message_rect.w = surfaceMessage->w; // controler la longueur du rectangle
+	Message_rect.h = surfaceMessage->h; // controler la hauteur du rectangle
+
+	// Copier l'objet créé pour l'afficher sur l'écran
+	SDL_RenderCopy(app->renderer, Message, NULL, &Message_rect);
+
+	// Libérer l'espace
+	SDL_FreeSurface(surfaceMessage);
+	SDL_DestroyTexture(Message);
 }
 
 // Retourne la texture qui correspond au type et la couleur de la pièce

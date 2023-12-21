@@ -1,1 +1,1 @@
-gcc test.c chess_bot/gui/gui.c -I"SDL2/include" -L"SDL2/lib" -Wall -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o test
+gcc test.c chess_bot/gui/gui.c chess_bot/chess_engine/jeu.c -I"SDL2/include" -L"SDL2/lib" -Wall -lmingw32 -lSDL2main -lSDL2 -lSDL2_image -o bin/test

@@ -1,4 +1,4 @@
 test.c
-test.exe
+bin/test.exe
 main.exe
 SDL2/

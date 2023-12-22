@@ -8,10 +8,11 @@
 #define GUI_H
 
 #define SCREEN_WIDTH   650
-#define SCREEN_HEIGHT  750
+#define SCREEN_HEIGHT  770
 
 #define BOARD_POS_X 0
-#define BOARD_POS_Y 50
+#define BOARD_POS_Y 61
+#define BOARD_SIZE 648
 #define BOARD_OFFSET_X 8
 #define BOARD_OFFSET_Y 8
 

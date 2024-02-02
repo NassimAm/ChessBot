@@ -347,7 +347,7 @@ int main(int argc, char *argv[])
                         }
 
                         if ( cout == 100 ) {
-                            printf("v\n"); fflush(stdout);
+                            printf("v"); fflush(stdout);
                             break;
                         }
                     }

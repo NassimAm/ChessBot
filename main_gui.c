@@ -75,8 +75,9 @@ int main(int argc, char *argv[])
     Est[4] = estim5;
     Est[5] = estim6;
     Est[6] = estim7;
+    Est[7] = estim8;
     // Nombre de fonctions d'estimation disponibles
-    nbEst = 7;        
+    nbEst = 8;        
 
     // Choix du type d'exécution (pc-contre-pc ou user-contre-pc) ...
     printf("Type de parties (B:Blancs  N:Noirs) :\n");
@@ -96,7 +97,8 @@ int main(int argc, char *argv[])
         printf("4- basée sur le nb de pieces et les menaces\n");
         printf("5- basée sur le nb de pieces et l'occupation\n");
         printf("6- basée sur une combinaisant de 3 estimations: (2 -> 5 -> 4)\n");
-        printf("7- une fonction d'estimation aléatoire (ou à définir) \n\n");
+        printf("7- une fonction d'estimation aléatoire\n");
+        printf("8- basée sur le nombre de cases occupées\n\n");
         if (typeExec != 3) {
             printf("Donnez la fonction d'estimation utilisée par le PC pour le joueur B : ");
             scanf(" %d", &estMax);

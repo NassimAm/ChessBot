@@ -503,17 +503,111 @@ int estim6( struct config *conf )
 } // fin de estim6
 
 
-/* Une fonction d'estimation vide */
+/* Une fonction d'estimation aléatoire */
 int estim7( struct config *conf )
 {
-        // Mettez ici votre code ...
-        //         ...
-        //         ...
-
-        // et remplacez la valeur retournée 
-        return (rand() % 200) - 100;        
-
+   return (rand() % 200) - 100;
 } // fin de estim7
+
+/* Estimation basée sur l'espace controllé par chaque joueur (nombre de cases)*/
+int estim8( struct config *conf )
+{
+   int mode = MAX;
+   int casesScore = 0;
+   int a, b, stop;
+   for (int i=0; i<8; i++)
+   {
+      for (int j=0; j<8; j++) {
+         if(conf->mat[i][j] != 0) { // Si la case n'est pas vide
+            mode = conf->mat[i][j] / abs(conf->mat[i][j]);
+            switch (abs(conf->mat[i][j])) {
+               case 'p' :  
+                  if ( i < 7 && conf->mat[i+1][j] == 0 ) casesScore += mode; // avance d'une case
+                  if ( i == 1 && conf->mat[2][j] == 0 && conf->mat[3][j] == 0) casesScore += mode * 2; // avance de 2 cases
+                  if ( i < 7 && j > 0 && conf->mat[i+1][j-1] < 0 ) casesScore += mode;
+                  if ( i < 7 && j < 7 && conf->mat[i+1][j+1] < 0 ) casesScore += mode;
+                  break;
+               // mvmt CAVALIER ...
+               case 'c' : 
+                  for (int k=0; k<8; k++)
+                     if ( i+dC[k][0] <= 7 && i+dC[k][0] >= 0 && j+dC[k][1] <= 7 && j+dC[k][1] >= 0 )
+                        if ( conf->mat[ i+dC[k][0] ] [ j+dC[k][1] ] <= 0 )  {
+                           casesScore += mode;
+                        }
+                  break;
+               // mvmt FOU ...
+               case 'f' : 
+                  for (int k=1; k<8; k += 2) {
+                     // traitement des directions impaires (1, 3, 5 et 7)
+                     stop = 0;
+                     a = i + D[k][0];
+                     b = j + D[k][1];                   
+                     while ( !stop && a >= 0 && a <= 7 && b >= 0 && b <= 7 ) {
+                           if ( mode * conf->mat[ a ] [ b ] > 0 )  stop = 1;
+                           else {
+                              if ( mode * conf->mat[a][b] < 0 ) stop = 1;
+                              casesScore += mode;
+                              a = a + D[k][0];
+                              b = b + D[k][1];
+                           }
+                     } // while
+                  } // for
+                  break;
+               // mvmt TOUR ...
+               case 't' : 
+                  for (int k=0; k<8; k+=2) {
+                     // traitement des directions paires (0, 2, 4 et 6)
+                     stop = 0;
+                     a = i + D[k][0];
+                     b = j + D[k][1];                 
+                     while ( !stop && a >= 0 && a <= 7 && b >= 0 && b <= 7 ) {
+                           if ( mode * conf->mat[ a ] [ b ] > 0 )  stop = 1;
+                           else {
+                              if ( mode * conf->mat[a][b] < 0 ) stop = 1;
+                              casesScore += mode;
+                              a = a + D[k][0];
+                              b = b + D[k][1];
+                           }
+                     } // while
+                  } // for
+                  break;
+               // mvmt REINE ...
+               case 'n' : 
+                  for (int k=0; k<8; k+= 1) {
+                     // traitement des 8 directions paires et impaires
+                     stop = 0;
+                     a = i + D[k][0];
+                     b = j + D[k][1];                   
+                     while ( !stop && a >= 0 && a <= 7 && b >= 0 && b <= 7 ) {
+                        if ( mode * conf->mat[ a ] [ b ] > 0 )  stop = 1;
+                        else {
+                           if ( mode * conf->mat[a][b] < 0 ) stop = 1;
+                           casesScore += mode;
+                           a = a + D[k][0];
+                           b = b + D[k][1];
+                        }
+                     } // while
+                  } // for
+                  break;
+               // mvmt ROI ...
+               case 'r' : 
+                  for (int k=0; k<8; k+=1) {
+                     // traitement des 8 directions paires et impaires
+                     a = i + D[k][0];
+                     b = j + D[k][1];                   
+                     if ( a >= 0 && a <= 7 && b >= 0 && b <= 7 ) 
+                           if ( mode * conf->mat[a][b] <= 0 ) {
+                              casesScore += mode;
+                           }
+                  } // for
+                  break;
+            }
+         }
+      }
+   }
+
+   return casesScore;
+}
 
 /***********************************************************************************/
 

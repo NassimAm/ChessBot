@@ -93,7 +93,7 @@ int minmax_ab( struct config *conf, int mode, int niv, int alpha, int beta, int 
    // npp: le nombre de pieces dans le parent de conf
    npc = npieces(conf);   
 
-   if ( feuille(conf, &score) ) 
+   if ( feuille(conf, &score) )
       return score;
 
    if ( niv == 0 ) {	// si le niveau souhaité est atteint
@@ -111,6 +111,12 @@ int minmax_ab( struct config *conf, int mode, int niv, int alpha, int beta, int 
    if ( mode == MAX ) {
 
       generer_succ( conf, MAX, T, &n );
+
+      // Match nul (pas de coups possibles pour Blanc et le roi blanc n'est pas checké)
+      if ( conf->xrB != -1 && n == 0 && !caseMenaceePar( MIN, conf->xrB, conf->yrB, conf ) )
+      {
+         return 0;
+      }
 
       if ( largeur != +INFINI ) {
          for (i=0; i<n; i++) 
@@ -137,6 +143,12 @@ int minmax_ab( struct config *conf, int mode, int niv, int alpha, int beta, int 
 
       generer_succ( conf, MIN, T, &n );
 
+      // Match nul (pas de coups possibles pour Noir et le roi noir n'est pas checké)
+      if ( conf->xrN != -1 && n == 0 && !caseMenaceePar( MAX, conf->xrN, conf->yrN, conf ) )
+      {
+         return 0;
+      }
+
       if ( largeur != +INFINI ) {
          for (i=0; i<n; i++) 
              T[i].val = Est[numFctEst]( &T[i] );                    
@@ -148,20 +160,20 @@ int minmax_ab( struct config *conf, int mode, int niv, int alpha, int beta, int 
 
       score = beta;
       for ( i=0; i<n; i++ ) {
-          score2 = minmax_ab( &T[i], MAX, niv-1, alpha, score, largeur, numFctEst, npc );
-          if (score2 < score) score = score2;
-             if (score <= alpha) {
-                // Coupe Alpha
-                nbAlpha++;      // compteur de coupes alpha
-                return score;   // evaluation tronquee ***
-             }
-          }
-      }
+         score2 = minmax_ab( &T[i], MAX, niv-1, alpha, score, largeur, numFctEst, npc );
+         if (score2 < score) score = score2;
+            if (score <= alpha) {
+               // Coupe Alpha
+               nbAlpha++;      // compteur de coupes alpha
+               return score;   // evaluation tronquee ***
+            }
+         }
+   }
 
-      if ( score == +INFINI ) score = +100;
-      if ( score == -INFINI ) score = -100;
+   if ( score == +INFINI ) score = +100;
+   if ( score == -INFINI ) score = -100;
 
-      return score;
+   return score;
 
 } // fin de minmax_ab
 
@@ -191,10 +203,6 @@ int feuille( struct config *conf, int *cout )
       *cout = +100;
       return 1;
    }
-
-   // Si Match nul cout = 0
-   if (  conf->xrB != -1 &&  conf->xrN != -1 && AucunCoupPossible( conf ) )
-      return 1;
 
    // Sinon ce n'est pas une config feuille 
    return 0;
@@ -805,7 +813,6 @@ void deplacementsN(struct config *conf, int x, int y, struct config T[], int *n 
                 break;
 
         }
-
 } // fin de deplacementsN
 
 
@@ -1322,11 +1329,18 @@ int dejaVisitee( struct config *conf )
 /* Teste s'il n'y a aucun coup possible dans la configuration conf */
 int AucunCoupPossible( struct config *conf )
 {
-        // ... A completer pour les matchs nuls
-        // ... vérifier que generer_succ retourne 0 configurations filles ...
-        // ... ou qu'une même configuration a été générée plusieurs fois ...
-        return 0;
+   // ... A completer pour les matchs nuls
+   // ... vérifier que generer_succ retourne 0 configurations filles ...
+   struct config T[100];
+   int n_max = 0, n_min = 0;
 
+   generer_succ( conf, MAX, T, &n_max );
+   generer_succ( conf, MIN, T, &n_min );
+   // ... ou qu'une même configuration a été générée plusieurs fois ...
+   if(n_max == 0 || n_min == 0)
+      return 1;
+   else
+      return 0;
 } // fin de AucunCoupPossible
 
 /***********************************************************************************/

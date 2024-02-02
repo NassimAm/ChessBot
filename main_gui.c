@@ -61,7 +61,8 @@ int main(int argc, char *argv[])
     int typeExec, refaire;
 
     char coup[20] = "";
-    char nomf[20];  // nom du fichier de sauvegarde
+    char pathf[100] = "records/";
+    char nomf[50];  // nom du fichier de sauvegarde
     char ch[100];
 
     struct config T[100], conf, conf1;
@@ -150,7 +151,8 @@ int main(int argc, char *argv[])
     printf("\nNom du fichier texte où sera sauvegarder la partie : ");
     fgets(ch, 20, stdin);
     sscanf(ch," %s", nomf);
-    f = fopen(nomf, "w");
+    strcat(pathf, nomf);
+    f = fopen(pathf, "w");
     
     fprintf(f, "--- Estimation_pour_Blancs = %d \t Estimation_pour_Noirs = %d ---\n", \
             (typeExec != 3 ? estMax+1 : 0), (typeExec != 2 ? estMin+1 : 0) );
@@ -203,14 +205,14 @@ int main(int argc, char *argv[])
 
             case 2:
                 drawText(app, "USER (N)", BOARD_OFFSET_X, 2);
-                drawText(app, "PC (B)", BOARD_OFFSET_X, BOARD_POS_Y + BOARD_SIZE);
+                drawText(app, "PC (B)", BOARD_OFFSET_X, BOARD_POS_Y + BOARD_SIZE - BOARD_OFFSET_Y);
                 drawText(app, msgb1, BOARD_OFFSET_X, BOARD_POS_Y + BOARD_SIZE - BOARD_OFFSET_Y + 20);
                 drawText(app, msgb2, BOARD_OFFSET_X, BOARD_POS_Y + BOARD_SIZE - BOARD_OFFSET_Y + 40);
                 break;
             
             default:
                 drawText(app, "PC (N)", BOARD_OFFSET_X, 2);
-                drawText(app, "USER (B)", BOARD_OFFSET_X, BOARD_POS_Y + BOARD_SIZE);
+                drawText(app, "USER (B)", BOARD_OFFSET_X, BOARD_POS_Y + BOARD_SIZE - BOARD_OFFSET_Y);
                 drawText(app, msgn1, BOARD_OFFSET_X, 20);
                 drawText(app, msgn2, BOARD_OFFSET_X, 40);
                 break;
@@ -333,19 +335,24 @@ int main(int argc, char *argv[])
                     score = -INFINI;
                     j = -1;
 
+                    printf("Tour du joueur maximisant 'B' (Essai des alternatives):\n");
                     for (i=0; i<n; i++) {
                         cout = minmax_ab( &T[i], MIN, hauteur, score, +INFINI, largeur, estMax, nbp );
+
                         printf("."); fflush(stdout);
                         
                         if ( cout > score ) {  // Choisir le meilleur coup (c-a-d le plus grand score)
-                        score = cout;
-                        j = i;
+                            score = cout;
+                            j = i;
                         }
+
                         if ( cout == 100 ) {
-                        printf("v"); fflush(stdout);
-                        break;
+                            printf("v\n"); fflush(stdout);
+                            break;
                         }
                     }
+                    printf("\n");
+
                     if ( j != -1 ) { // jouer le coup et aller à la prochaine itération ...
                         formuler_coup( &conf, &T[j], coup );
                         copier( &T[j], &conf );
@@ -362,8 +369,15 @@ int main(int argc, char *argv[])
                 } // fin else // MAX ===> PC
         
                 if (stop) {
-                    printf("\n *** le joueur maximisant 'B' a perdu ***\n");
-                    fprintf(f, "Victoire de 'N'\n");
+                    if(scoreb == 0)
+                    {
+                        printf("\n *** Match Nul (Stalemate) ! ***\n");
+                    }
+                    else
+                    {
+                        printf("\n *** le joueur maximisant 'B' a perdu ***\n");
+                        fprintf(f, "Victoire de 'N'\n");
+                    }
                 }
 
             }  // if ( tour == MAX )
@@ -476,20 +490,24 @@ int main(int argc, char *argv[])
 
                     // 3- on lance l'exploration des alternatives triées avec la profondeur voulue:
                     score = +INFINI;
-                    j = -1;                
+                    j = -1;
+
+                    printf("Tour du joueur minimisant 'N' (Essai des alternatives):\n");               
                     for (i=0; i<n; i++) {
                         cout = minmax_ab( &T[i], MAX, hauteur, -INFINI, score, largeur, estMin, nbp );
                         //cout = minmax_ab( &T[i], MAX, hauteur, -INFINI, +INFINI, largeur, estMin );
                         printf("."); fflush(stdout);
                         if ( cout < score ) {  // Choisir le meilleur coup (c-a-d le plus petit score)
-                        score = cout;
-                        j = i;
+                            score = cout;
+                            j = i;
                         }
                         if ( cout == -100 ) {
-                        printf("v"); fflush(stdout);
-                        break;
+                            printf("v"); fflush(stdout);
+                            break;
                         }
                     }
+                    printf("\n");
+
                     if ( j != -1 ) { // jouer le coup et aller à la prochaine itération ...
                         formuler_coup( &conf, &T[j], coup );
                         copier( &T[j], &conf );
@@ -506,8 +524,15 @@ int main(int argc, char *argv[])
                 } // fin else // MIN ===> PC
 
                 if (stop) {
-                    printf("\n *** le joueur minimisant 'N' a perdu ***\n");
-                    fprintf(f, "Victoire de 'B'\n");
+                    if(scoren == 0)
+                    {
+                        printf("\n *** Match Nul (Stalemate) ! ***\n");
+                    }
+                    else
+                    {
+                        printf("\n *** le joueur minimisant 'N' a perdu ***\n");
+                        fprintf(f, "Victoire de 'B'\n");
+                    }
                 }
 
             } // fin else // tour == MIN

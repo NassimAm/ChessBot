@@ -1,0 +1,202 @@
+--- Estimation_pour_Blancs = 2 	 Estimation_pour_Noirs = 2 ---
+--- coup N° 0 ---
+tcfnrfct
+pppppppp
+        
+        
+        
+        
+PPPPPPPP
+TCFNRFCT
+
+--- coup N° 1 ---
+tcfnrfct
+pppppppp
+        
+        
+        
+C       
+PPPPPPPP
+T FNRFCT
+
+--- coup N° 2 ---
+tcfnrfct
+ ppppppp
+p       
+        
+        
+C       
+PPPPPPPP
+T FNRFCT
+
+--- coup N° 3 ---
+tcfnrfct
+ ppppppp
+p       
+        
+    P   
+C       
+PPPP PPP
+T FNRFCT
+
+--- coup N° 4 ---
+tcfnrf t
+ ppppppp
+p    c  
+        
+    P   
+C       
+PPPP PPP
+T FNRFCT
+
+--- coup N° 5 ---
+tcfnrf t
+ ppppppp
+p    c  
+        
+  F P   
+C       
+PPPP PPP
+T FNR CT
+
+--- coup N° 6 ---
+tcfnrf t
+ ppppppp
+p       
+        
+  F c   
+C       
+PPPP PPP
+T FNR CT
+
+--- coup N° 7 ---
+tcfnrf t
+ ppppppp
+p       
+       N
+  F c   
+C       
+PPPP PPP
+T F R CT
+
+--- coup N° 8 ---
+tcfnrf t
+ ppppppp
+p  c    
+       N
+  F     
+C       
+PPPP PPP
+T F R CT
+
+--- coup N° 9 ---
+tcfnrf t
+ ppppppp
+p  c    
+   N    
+  F     
+C       
+PPPP PPP
+T F R CT
+
+--- coup N° 10 ---
+tcfnrf t
+ ppppppp
+p       
+   N    
+  c     
+C       
+PPPP PPP
+T F R CT
+
+--- coup N° 11 ---
+tcfnrf t
+ ppppppp
+p       
+   N    
+  C     
+        
+PPPP PPP
+T F R CT
+
+--- coup N° 12 ---
+tcfnrf t
+ p ppppp
+p p     
+   N    
+  C     
+        
+PPPP PPP
+T F R CT
+
+--- coup N° 13 ---
+tcfnrf t
+ p ppppp
+p p     
+    N   
+  C     
+        
+PPPP PPP
+T F R CT
+
+--- coup N° 14 ---
+tcfnrf t
+ p  pppp
+p pp    
+    N   
+  C     
+        
+PPPP PPP
+T F R CT
+
+--- coup N° 15 ---
+tcfnrf t
+ p  pppp
+p pp    
+        
+  C  N  
+        
+PPPP PPP
+T F R CT
+
+--- coup N° 16 ---
+tcfnrf t
+ p  pppp
+p p     
+   p    
+  C  N  
+        
+PPPP PPP
+T F R CT
+
+--- coup N° 17 ---
+tcfnrf t
+ p  pppp
+p p     
+   pC   
+     N  
+        
+PPPP PPP
+T F R CT
+
+--- coup N° 18 ---
+tcfnrf t
+    pppp
+p p     
+ p pC   
+     N  
+        
+PPPP PPP
+T F R CT
+
+--- coup N° 19 ---
+tcfnrf t
+    pNpp
+p p     
+ p pC   
+        
+        
+PPPP PPP
+T F R CT
+
+Victoire de 'B'

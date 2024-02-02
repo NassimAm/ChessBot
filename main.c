@@ -313,8 +313,15 @@ int main( int argc, char *argv[] )
          } // fin else // MAX ===> PC
  
          if (stop) {
-            printf("\n *** le joueur maximisant 'B' a perdu ***\n");
-            fprintf(f, "Victoire de 'N'\n");
+            if(score == 0)
+            {
+               printf("\n *** Match Nul (Stalemate) ! ***\n");
+            }
+            else
+            {
+               printf("\n *** le joueur maximisant 'B' a perdu ***\n");
+               fprintf(f, "Victoire de 'N'\n");
+            }
          }
 
       }  // if ( tour == MAX )
@@ -450,8 +457,15 @@ int main( int argc, char *argv[] )
          } // fin else // MIN ===> PC
 
          if (stop) {
-            printf("\n *** le joueur minimisant 'N' a perdu ***\n");
-            fprintf(f, "Victoire de 'B'\n");
+            if(score == 0)
+            {
+               printf("\n *** Match Nul (Stalemate) ! ***\n");
+            }
+            else
+            {
+               printf("\n *** le joueur minimisant 'N' a perdu ***\n");
+               fprintf(f, "Victoire de 'B'\n");
+            }
          }
 
       } // fin else // tour == MIN

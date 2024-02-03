@@ -1,0 +1,7 @@
+Veuillez installer la bibliothèque SDL (biliothèque graphique) avec la commande suivante:
+
+- sudo apt install libsdl2-2.0-0 libsdl2-image-2.0-0 libsdl2-ttf-2.0-0
+
+Pour les fichiers importable de développement de la biliothèque SDL (Veuillez les installer pour pouvoir compiler le code):
+
+- sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev

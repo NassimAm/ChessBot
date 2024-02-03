@@ -1,0 +1,7 @@
+Pour compiler le programme, veuillez exécuter cette commande (au niveau du dossier du projet):
+
+- gcc main_gui.c chess_bot/gui/gui.c chess_bot/chess_engine/jeu.c -o bin/ChessBot $(sdl2-config --cflags --libs) -lSDL2_image -lSDL2_ttf
+
+Pour l'éxécuter au niveau du dossier bin:
+
+- ./ChessBot

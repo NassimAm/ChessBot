@@ -509,34 +509,49 @@ int estim7( struct config *conf )
    return (rand() % 200) - 100;
 } // fin de estim7
 
-/* Estimation basée sur l'espace controllé par chaque joueur (nombre de cases)*/
+/* Estimation basée sur le nb de pièces et le nb de cases occupées par chaque joueur (mobilité)*/
 int estim8( struct config *conf )
 {
    int mode = MAX;
    int casesScore = 0;
    int a, b, stop;
+   int pionNb = 0, chNb = 0, cfNb = 0, tNb = 0, nNb = 0;
+   const int poidsPion = 1, poidsRoi = 1;
+   const int poidsCh = 2;
+   const int poidsF = 3;
+   const int poidsTr = 4;
+   const int poidsRn = 5;
+
+   const double poidsNb = 3;
+   const double poidsMobilite = 2;
+
+   int score = 0;
+    
    for (int i=0; i<8; i++)
    {
       for (int j=0; j<8; j++) {
          if(conf->mat[i][j] != 0) { // Si la case n'est pas vide
             mode = conf->mat[i][j] / abs(conf->mat[i][j]);
             switch (abs(conf->mat[i][j])) {
-               case 'p' :  
-                  if ( i < 7 && conf->mat[i+1][j] == 0 ) casesScore += mode; // avance d'une case
-                  if ( i == 1 && conf->mat[2][j] == 0 && conf->mat[3][j] == 0) casesScore += mode * 2; // avance de 2 cases
-                  if ( i < 7 && j > 0 && conf->mat[i+1][j-1] < 0 ) casesScore += mode;
-                  if ( i < 7 && j < 7 && conf->mat[i+1][j+1] < 0 ) casesScore += mode;
+               case 'p' :
+                  pionNb += mode;  
+                  if ( i < 7 && conf->mat[i+1][j] == 0 ) casesScore += mode * poidsPion; // avance d'une case
+                  if ( i == 1 && conf->mat[2][j] == 0 && conf->mat[3][j] == 0) casesScore += mode * 2 * poidsPion; // avance de 2 cases
+                  if ( i < 7 && j > 0 && conf->mat[i+1][j-1] < 0 ) casesScore += mode * poidsPion;
+                  if ( i < 7 && j < 7 && conf->mat[i+1][j+1] < 0 ) casesScore += mode * poidsPion;
                   break;
                // mvmt CAVALIER ...
-               case 'c' : 
+               case 'c' :
+                  chNb += mode;
                   for (int k=0; k<8; k++)
                      if ( i+dC[k][0] <= 7 && i+dC[k][0] >= 0 && j+dC[k][1] <= 7 && j+dC[k][1] >= 0 )
                         if ( conf->mat[ i+dC[k][0] ] [ j+dC[k][1] ] <= 0 )  {
-                           casesScore += mode;
+                           casesScore += mode * poidsCh;
                         }
                   break;
                // mvmt FOU ...
-               case 'f' : 
+               case 'f' :
+                  cfNb += mode;
                   for (int k=1; k<8; k += 2) {
                      // traitement des directions impaires (1, 3, 5 et 7)
                      stop = 0;
@@ -546,7 +561,7 @@ int estim8( struct config *conf )
                            if ( mode * conf->mat[ a ] [ b ] > 0 )  stop = 1;
                            else {
                               if ( mode * conf->mat[a][b] < 0 ) stop = 1;
-                              casesScore += mode;
+                              casesScore += mode * poidsF;
                               a = a + D[k][0];
                               b = b + D[k][1];
                            }
@@ -554,7 +569,8 @@ int estim8( struct config *conf )
                   } // for
                   break;
                // mvmt TOUR ...
-               case 't' : 
+               case 't' :
+                  tNb += mode;
                   for (int k=0; k<8; k+=2) {
                      // traitement des directions paires (0, 2, 4 et 6)
                      stop = 0;
@@ -564,7 +580,7 @@ int estim8( struct config *conf )
                            if ( mode * conf->mat[ a ] [ b ] > 0 )  stop = 1;
                            else {
                               if ( mode * conf->mat[a][b] < 0 ) stop = 1;
-                              casesScore += mode;
+                              casesScore += mode * poidsTr;
                               a = a + D[k][0];
                               b = b + D[k][1];
                            }
@@ -572,7 +588,8 @@ int estim8( struct config *conf )
                   } // for
                   break;
                // mvmt REINE ...
-               case 'n' : 
+               case 'n' :
+                  nNb += mode; 
                   for (int k=0; k<8; k+= 1) {
                      // traitement des 8 directions paires et impaires
                      stop = 0;
@@ -582,7 +599,7 @@ int estim8( struct config *conf )
                         if ( mode * conf->mat[ a ] [ b ] > 0 )  stop = 1;
                         else {
                            if ( mode * conf->mat[a][b] < 0 ) stop = 1;
-                           casesScore += mode;
+                           casesScore += mode * poidsRn;
                            a = a + D[k][0];
                            b = b + D[k][1];
                         }
@@ -597,7 +614,7 @@ int estim8( struct config *conf )
                      b = j + D[k][1];                   
                      if ( a >= 0 && a <= 7 && b >= 0 && b <= 7 ) 
                            if ( mode * conf->mat[a][b] <= 0 ) {
-                              casesScore += mode;
+                              casesScore += mode * poidsRoi;
                            }
                   } // for
                   break;
@@ -606,7 +623,99 @@ int estim8( struct config *conf )
       }
    }
 
-   return casesScore;
+   score = (poidsMobilite * casesScore * 100.0 / 64.0 + poidsNb * (pionNb*2 + cfNb*4 + chNb*6 + tNb*8 + nNb*20) * 100.0 / 72.0) / (poidsMobilite + poidsNb);
+
+   if (score > 95) score = 95;                // pour rétrécir l'intervalle à
+   if (score < -95) score = -95;                // ]-95 , +95[ car ce n'est qu'une estimation
+
+   return score;
+}
+
+/* Estimation basée sur le nb de pièces les captures et la protection des pièces*/
+int estim9( struct config *conf )
+{
+   int i, j;
+   int pionB = 0, pionN = 0, chB = 0, chN = 0, cfB = 0, cfN = 0, tB = 0, tN = 0, nB = 0, nN = 0;
+
+   const int poidsCapture = 2;
+   const int poidsProtection = 1;
+   const double poidsNbPieces = 3;
+   const double poidsStrategie = 2;
+
+   int score = 0, scoreNb = 0, scoreS = 0;
+
+   for (i=0; i<8; i++)
+   {
+      for (j=0; j<8; j++) {
+         if ( conf->mat[i][j] < 0) {
+            // Attaque du joueur blanc
+            if(caseMenaceePar(MAX, i, j, conf))
+            {
+               scoreS += poidsCapture;
+               if ( conf->mat[i][j] == -'c' || conf->mat[i][j] == -'f' )
+                  scoreS += poidsCapture;
+               if ( conf->mat[i][j] == -'t' || conf->mat[i][j] == -'n' )
+                  scoreS += 2 * poidsCapture;
+               if ( conf->mat[i][j] == -'r' )
+                  scoreS += 5 * poidsCapture;
+            }
+            // Le joueur noir protège la case (i,j) grâce à une de ses pièces
+            if(caseMenaceePar(MIN, i, j, conf))
+            {
+               scoreS -= poidsProtection; // Pour éviter de trop sacrifier les reines et les tours
+               if ( conf->mat[i][j] == -'c' || conf->mat[i][j] == -'f' )
+                     scoreS -= poidsProtection;
+               if ( conf->mat[i][j] == -'p' ) // Pour favoriser l'attaque avec les pions tout en les protégeant
+                     scoreS -= 2 * poidsProtection;
+            }
+         }
+         if ( conf->mat[i][j] > 0 ) {
+            // Attaque du joueur noir
+            if(caseMenaceePar(MIN, i, j, conf))
+            {
+               scoreS -= poidsCapture;
+               if ( conf->mat[i][j] == 'c' || conf->mat[i][j] == 'f' )
+                  scoreS -= poidsCapture;
+               if ( conf->mat[i][j] == 't' || conf->mat[i][j] == 'n' )
+                  scoreS -= 2 * poidsCapture;
+               if ( conf->mat[i][j] == 'r' )
+                  scoreS -= 5 * poidsCapture;
+            }
+            // Le joueur blanc protège la case (i,j) grâce à une de ses pièces
+            if(caseMenaceePar(MAX, i, j, conf))
+            {
+               scoreS += poidsProtection; // Pour éviter de trop sacrifier les reines et les tours
+               if ( conf->mat[i][j] == 'c' || conf->mat[i][j] == 'f' )
+                     scoreS += poidsProtection;
+               if ( conf->mat[i][j] == 'p' ) // Pour favoriser l'attaque avec les pions tout en les protégeant
+                     scoreS += 2 * poidsProtection;
+            }
+         }
+
+         // Nombre de pièces
+         switch (conf->mat[i][j]) {
+            case 'p' : pionB++;   break;
+            case 'c' : chB++; break;
+            case 'f' : cfB++;  break;
+            case 't' : tB++; break;
+            case 'n' : nB++;  break;
+
+            case -'p' : pionN++;  break;
+            case -'c' : chN++; break;
+            case -'f' : cfN++;  break;
+            case -'t' : tN++; break;
+            case -'n' : nN++;  break;
+         }
+      }
+   }
+
+   scoreNb = (pionB*2 + cfB*4 + chB*6 + tB*8 + nB*20) - (pionN*2 + cfN*4 + chN*6 + tN*8 + nN*20);
+   score = (poidsNbPieces * (scoreNb * 100.0 / 72.0) + poidsStrategie * (scoreS * 100.0 / 58.0)) / (poidsNbPieces + poidsStrategie);
+
+   if (score > 95) score = 95;                // pour rétrécir l'intervalle à
+   if (score < -95) score = -95;                // ]-95 , +95[ car ce n'est qu'une estimation
+
+   return score;
 }
 
 /***********************************************************************************/

@@ -77,6 +77,7 @@ int estim6( struct config *conf );
 */
 int estim7( struct config *conf );
 int estim8( struct config *conf );
+int estim9( struct config *conf );
 
 /* ---------------------------------- 
    Génère, pour le joueur 'mode', les successeurs de la configuration 'conf' dans le tableau 'T', 
